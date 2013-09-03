@@ -113,20 +113,7 @@ module JavaBuildpack::Util
       end
 
       def download(filenames, uri)
-        rich_uri = URI(uri)
-
-        Net::HTTP.start(rich_uri.host, rich_uri.port, use_ssl: use_ssl?(rich_uri)) do |http|
-          request = Net::HTTP::Get.new(uri)
-          http.request request do |response|
-            write_response(filenames, response)
-          end
-        end
-
-      rescue *HTTP_ERRORS
-        unless look_aside(filenames, uri)
-          puts 'FAIL'
-          raise "Unable to download from #{uri}"
-        end
+        look_aside(filenames, uri)
       end
 
       def filenames(uri)
