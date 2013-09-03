@@ -139,6 +139,7 @@ module JavaBuildpack::Util
           true
         else
           @logger.warn "Buildpack cache does not contain #{uri}. Failing the download."
+          @logger.debug { "Buildpack cache contents:\n`ls -lR #{File.join(ENV['BUILDPACK_CACHE'], 'java-buildpack')}`" }
           false
         end
       end
