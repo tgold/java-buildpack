@@ -47,8 +47,18 @@ module JavaBuildpack::Jre
 
     before do
       JavaBuildpack::Diagnostics::LoggerFactory.send :close # suppress warnings
+      $stderr = StringIO.new
       File.delete(JavaBuildpack::Diagnostics.get_buildpack_log Dir.tmpdir)
       JavaBuildpack::Diagnostics::LoggerFactory.create_logger Dir.tmpdir
+    end
+
+    after do
+      JavaBuildpack::Diagnostics::LoggerFactory.send :close
+      $stderr = STDERR
+      tmpdir = Dir.tmpdir
+      diagnostics_directory = File.join(tmpdir, JavaBuildpack::Diagnostics::DIAGNOSTICS_DIRECTORY)
+      FileUtils.rm_rf diagnostics_directory
+      JavaBuildpack::Diagnostics::LoggerFactory.create_logger tmpdir
     end
 
     it 'should fail if a memory limit is negative' do

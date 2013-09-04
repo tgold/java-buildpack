@@ -48,7 +48,7 @@ module JavaBuildpack::Diagnostics
       set_log_level
 
       get_logger.debug(log_file)
-      get_logger.debug{ "Logger creation stack: #{caller}" }
+      get_logger.debug{ "Logger creation stack: #{caller.join("\n")}" }
       if logger_recreated
         get_logger.warn("Logger was re-created by #{caller[0]}")
       end
@@ -92,7 +92,7 @@ module JavaBuildpack::Diagnostics
 
     def self.get_logger_internal
       @@monitor.synchronize do
-        @@logger
+        (defined? @@logger) ? @@logger : nil
       end
     end
 
@@ -124,8 +124,8 @@ module JavaBuildpack::Diagnostics
 
     def self.close
       @@monitor.synchronize do
-        if @@logger
-          @@logger.debug{ "Logger close stack: #{caller}" }
+        if (defined? @@logger) && @@logger
+          @@logger.debug{ "Logger close stack: #{caller.join("\n")}" }
           @@logger = nil
         end
      end

@@ -50,7 +50,24 @@ module JavaBuildpack
       Test::StubJre1.stub(:new).and_return(stub_jre1)
       Test::StubJre2.stub(:new).and_return(stub_jre2)
 
+      JavaBuildpack::Diagnostics::LoggerFactory.send :close
       $stderr = StringIO.new
+      tmpdir = Dir.tmpdir
+      diagnostics_directory = File.join(tmpdir, JavaBuildpack::Diagnostics::DIAGNOSTICS_DIRECTORY)
+      FileUtils.rm_rf diagnostics_directory
+      JavaBuildpack::Diagnostics::LoggerFactory.create_logger tmpdir
+    end
+
+    after do
+      JavaBuildpack::Diagnostics::LoggerFactory.send :close
+      YAML.stub(:load_file).with(File.expand_path('config/logging.yml')).and_return(
+          'default_log_level' => 'INFO'
+      )
+      $stderr = STDERR
+      tmpdir = Dir.tmpdir
+      diagnostics_directory = File.join(tmpdir, JavaBuildpack::Diagnostics::DIAGNOSTICS_DIRECTORY)
+      FileUtils.rm_rf diagnostics_directory
+      JavaBuildpack::Diagnostics::LoggerFactory.create_logger tmpdir
     end
 
     it 'should raise an error if more than one container can run an application' do
