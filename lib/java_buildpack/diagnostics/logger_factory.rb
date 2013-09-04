@@ -124,8 +124,10 @@ module JavaBuildpack::Diagnostics
 
     def self.close
       @@monitor.synchronize do
-        get_logger.debug{ "Logger close stack: #{caller}" } # raises exception if @@logger is nil
-        @@logger = nil
+        if @@logger
+          @@logger.debug{ "Logger close stack: #{caller}" }
+          @@logger = nil
+        end
      end
     end
 
