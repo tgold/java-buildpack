@@ -70,6 +70,7 @@ module JavaBuildpack::Util
         lock_file.flock(File::LOCK_SH)
 
         File.open(filenames[:cached], File::RDONLY) do |cached_file|
+          logger.debug { "#{cached_file} " }
           yield cached_file
         end
       end
