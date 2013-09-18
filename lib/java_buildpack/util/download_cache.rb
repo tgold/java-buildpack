@@ -111,13 +111,16 @@ module JavaBuildpack::Util
     TEST_URI = 'http://download.pivotal.io.s3.amazonaws.com/openjdk/lucid/x86_64/index.yml'.freeze
 
     HTTP_OK = '200'
+    
+    proxy_addr = "http://proxy.de.abb.com"
+    proxy_port = 8080
 
     def self.internet_available?
       uri = TEST_URI
       rich_uri = URI(uri)
 
       # Beware known problems with timeouts: https://www.ruby-forum.com/topic/143840
-      Net::HTTP.start(rich_uri.host, rich_uri.port, read_timeout: 10, connect_timeout: 10, open_timeout: 10) do |http|
+      Net::HTTP::Proxy(proxy_addr, proxy_port).start(rich_uri.host, rich_uri.port, read_timeout: 10, connect_timeout: 10, open_timeout: 10) do |http|
         request = Net::HTTP::Get.new(uri)
         http.request request do |response|
           return response.code == HTTP_OK
@@ -142,7 +145,7 @@ module JavaBuildpack::Util
         begin
           rich_uri = URI(uri)
 
-          Net::HTTP.start(rich_uri.host, rich_uri.port, use_ssl: use_ssl?(rich_uri)) do |http|
+          Net::HTTP::Proxy(proxy_addr, proxy_port).start(rich_uri.host, rich_uri.port, use_ssl: use_ssl?(rich_uri)) do |http|
             request = Net::HTTP::Get.new(uri)
             http.request request do |response|
               write_response(filenames, response)
@@ -211,7 +214,7 @@ module JavaBuildpack::Util
     def update(filenames, uri)
       rich_uri = URI(uri)
 
-      Net::HTTP.start(rich_uri.host, rich_uri.port, use_ssl: use_ssl?(rich_uri)) do |http|
+      Net::HTTP::Proxy(proxy_addr, proxy_port).start(rich_uri.host, rich_uri.port, use_ssl: use_ssl?(rich_uri)) do |http|
         request = Net::HTTP::Get.new(uri)
         set_header request, 'If-None-Match', filenames[:etag]
         set_header request, 'If-Modified-Since', filenames[:last_modified]
