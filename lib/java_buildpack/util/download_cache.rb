@@ -127,7 +127,8 @@ module JavaBuildpack::Util
         end
       end
     rescue *HTTP_ERRORS
-      false
+      puts 'FAIL'
+      raise "Unable to download from #{uri}"
     end
 
     @@internet_up = DownloadCache.internet_available?
