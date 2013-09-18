@@ -121,7 +121,7 @@ module JavaBuildpack::Util
 
       # Beware known problems with timeouts: https://www.ruby-forum.com/topic/143840
       Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT).start(rich_uri.host, rich_uri.port, read_timeout: 10, connect_timeout: 10, open_timeout: 10) do |http|
-        request = Net::HTTP::Get.new(uri)
+        request = Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT)::Get.new(uri)
         http.request request do |response|
           return response.code == HTTP_OK
         end
