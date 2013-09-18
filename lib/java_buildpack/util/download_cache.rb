@@ -112,7 +112,7 @@ module JavaBuildpack::Util
 
     HTTP_OK = '200'
     
-    PROXY_ADDR = "http://proxy.de.abb.com"
+    PROXY_ADDR = "proxy.de.abb.com"
     PROXY_PORT = 8080
 
     def self.internet_available?
