@@ -142,7 +142,7 @@ module JavaBuildpack::Util
     end
 
     def download(filenames, uri)
-      if DownloadCache.internet_up
+      if true
         begin
           rich_uri = URI(uri)
 
