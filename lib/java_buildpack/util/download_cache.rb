@@ -146,7 +146,7 @@ module JavaBuildpack::Util
           rich_uri = URI(uri)
 
           Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT).start(rich_uri.host, rich_uri.port, use_ssl: use_ssl?(rich_uri)) do |http|
-            request = Net::HTTP::Get.new(uri)
+            request = Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT)::Get.new(uri)
             http.request request do |response|
               write_response(filenames, response)
             end
@@ -215,7 +215,7 @@ module JavaBuildpack::Util
       rich_uri = URI(uri)
 
       Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT).start(rich_uri.host, rich_uri.port, use_ssl: use_ssl?(rich_uri)) do |http|
-        request = Net::HTTP::Get.new(uri)
+        request = Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT)::Get.new(uri)
         set_header request, 'If-None-Match', filenames[:etag]
         set_header request, 'If-Modified-Since', filenames[:last_modified]
 
