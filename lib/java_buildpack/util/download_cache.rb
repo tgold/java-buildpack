@@ -70,7 +70,6 @@ module JavaBuildpack::Util
         lock_file.flock(File::LOCK_SH)
 
         File.open(filenames[:cached], File::RDONLY) do |cached_file|
-          @logger.debug { "#{filenames[:cached]} " }
           yield cached_file
         end
       end
@@ -122,14 +121,13 @@ module JavaBuildpack::Util
 
       # Beware known problems with timeouts: https://www.ruby-forum.com/topic/143840
       Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT).start(rich_uri.host, rich_uri.port, read_timeout: 10, connect_timeout: 10, open_timeout: 10) do |http|
-        request = Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT)::Get.new(uri)
+        request = Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT)::Get.new(rich_uri.path)
         http.request request do |response|
           return response.code == HTTP_OK
         end
       end
     rescue *HTTP_ERRORS
-      puts 'FAIL'
-      raise "Unable to download from #{uri}"
+      false
     end
 
     @@internet_up = DownloadCache.internet_available?
@@ -148,7 +146,7 @@ module JavaBuildpack::Util
           rich_uri = URI(uri)
 
           Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT).start(rich_uri.host, rich_uri.port, use_ssl: use_ssl?(rich_uri)) do |http|
-            request = Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT)::Get.new(uri)
+            request = Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT)::Get.new(rich_uri.path)
             http.request request do |response|
               write_response(filenames, response)
             end
@@ -217,7 +215,7 @@ module JavaBuildpack::Util
       rich_uri = URI(uri)
 
       Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT).start(rich_uri.host, rich_uri.port, use_ssl: use_ssl?(rich_uri)) do |http|
-        request = Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT)::Get.new(uri)
+        request = Net::HTTP::Proxy(PROXY_ADDR, PROXY_PORT)::Get.new(rich_uri)
         set_header request, 'If-None-Match', filenames[:etag]
         set_header request, 'If-Modified-Since', filenames[:last_modified]
 
